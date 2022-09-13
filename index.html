@@ -1,0 +1,1941 @@
+<html>
+
+<head>
+    <title>Revenge of the Necromancer</title>
+
+    <style>
+        html,
+        body {
+            font-family: Sans-Serif;
+            background-color: black;
+            color: white;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #container {
+            position: relative;
+        }
+
+        #container canvas,
+        .overlay {
+            position: absolute;
+        }
+
+        a, a:visited {
+            color: lightskyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width: 800px; margin: auto; padding: 10px;">
+        <div style="display: none;">
+            <img id="glow" src="images/glow.png" />
+
+            <img id="water" src="images/water.png" />
+            <img id="sand" src="images/sand.png" />
+            <img id="grass" src="images/grass.png" />
+            <img id="dirt" src="images/dirt.png" />
+            <img id="stone" src="images/stone.png" />
+            <img id="wood" src="images/wood.png" />
+
+            <img id="necromancer" src="images/necromancer.png" />
+            <img id="slime" src="images/slime.png" />
+            <img id="skeleton" src="images/skeleton.png" />
+            <img id="goblin" src="images/goblin.png" />
+            <img id="demon" src="images/demon.png" />
+
+            <img id="soldier" src="images/soldier.png" />
+            <img id="knight" src="images/knight.png" />
+            <img id="king" src="images/king.png" />
+
+            <img id="mana_crystals" src="images/mana_crystals.png" />
+
+        </div>
+
+        <div style="user-select: none;">
+            <div id="container">
+                <canvas id="game_canvas" width="700" height="700" style="image-rendering: pixelated;"></canvas>
+                <div class="overlay" id="gameover_overlay"
+                    style="width: 700px; height: 700px; background-color: rgba(0, 0, 0, 0.5); display: none;">
+                    <table style="width: 100%; height: 100%; text-align: center;">
+                        <tr>
+                            <td style="vertical-align: middle;">
+                                <div style="font-size: 3.5em; margin-bottom: 20px;">
+                                    <b>Game Over</b>
+                                </div>
+                                <div style="font-size: 1.5em;">
+                                    Click to play again
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="overlay" id="victory_overlay"
+                    style="width: 700px; height: 700px; background-color: rgba(0, 0, 0, 0.5); display: none;">
+                    <table style="width: 100%; height: 100%; text-align: center;">
+                        <tr>
+                            <td style="vertical-align: middle;">
+                                <div style="font-size: 3.5em; margin-bottom: 20px;">
+                                    <b>Victory</b>
+                                </div>
+                                <div style="font-size: 1.5em;">
+                                    You have defeated the evil king!
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="overlay" id="start_overlay"
+                    style="width: 700px; height: 700px; background-color: rgba(30, 30, 30);">
+                    <table style="width: 100%; height: 100%; text-align: center;">
+                        <tr>
+                            <td style="vertical-align: middle;">
+                                <div>
+                                    <img src="images/necromancer.png" width="200" height="200"
+                                        style="image-rendering: pixelated; margin-top: -135px; margin-right: -30px;" />
+                                </div>
+                                <div style="font-size: 3.5em; margin-top: 20px; margin-bottom: 20px; ">
+                                    <b>Revenge of the Necromancer</b>
+                                </div>
+                                <div style="font-size: 1.5em;">
+                                    Click to play
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div style="padding-top: 702px;">
+            <table style="width: 700px; user-select: none;">
+                <tr>
+                    <td style="white-space: nowrap;">
+                        <span>HP: </span> <span id="current_hp"></span> &#47; 250
+                    </td>
+                    <td style="width: 100%; padding-left: 3px; padding-right: 5px;">
+                        <div style="border: 3px solid rgb(0, 255, 0); width: 100%; display: inline-block;">
+                            <div id="hp_bar" style="background-color: rgb(0, 255, 0); width: 100%; color: transparent;">
+                                -
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="white-space: nowrap;">
+                        <span>MP: </span> <span id="current_mp"></span> &#47; 1000 <br />
+                    </td>
+                    <td style="width: 100%; padding-left: 3px; padding-right: 5px;">
+                        <div style="border: 3px solid cyan; width: 100%; display: inline-block;">
+                            <div id="mp_bar" style="background-color: cyan; width: 0%; color: transparent;">
+                                -
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td>
+                        Slimes:
+                    </td>
+                    <td>
+                        <span id="slime_count"></span> &#47; <span id="slime_limit"></span>
+                    </td>
+                    <td>
+                        (1 MP cost, press "1" key)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Skeletons:
+                    </td>
+                    <td>
+                        <span id="skeleton_count"></span> &#47; <span id="skeleton_limit"></span>
+                    </td>
+                    <td>
+                        (5 MP cost, press "2" key)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Goblins:
+                    </td>
+                    <td>
+                        <span id="goblin_count"></span> &#47; <span id="goblin_limit"></span>
+                    </td>
+                    <td>
+                        (10 MP cost, press "3" key)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Demons:
+                    </td>
+                    <td>
+                        <span id="demon_count"></span> &#47; <span id="demon_limit"></span>
+                    <td>
+                        (30 MP cost, press "4" key)
+                    </td>
+                </tr>
+            </table>
+            <hr />
+            <div>
+                Controls:
+                WASD or arrow keys to move. Click to shoot. 1 through 4 keys to summon shadows. <br />
+                About "Revenge of the Necromancer": You are a necromancer, and your goal is to defeat the evil king!
+                Monsters destroyed can be summoned as shadows up to a certain number using mana. Replenish mana near
+                mana
+                crystal mines.
+                Made for the <a href="https://js13kgames.com/" target="_blank">2022 js13kGames competition</a> by
+                <a href="https://twitter.com/zoan37/" target="_blank">@zoan37</a>.
+                Pixel art from <a href="https://opengameart.org/content/roguedb32-plus-add-on-tiles"
+                    target="_blank">OpenGameArt.org</a>.
+            </div>
+        </div>
+
+        </canvas>
+
+    </div>
+
+    <script>
+        // ZzFX - Zuper Zmall Zound Zynth - Micro Edition
+        // MIT License - Copyright 2019 Frank Force
+        // https://github.com/KilledByAPixel/ZzFX
+
+        // This is a tiny build of zzfx with only a zzfx function to play sounds.
+        // You can use zzfxV to set volume.
+        // Feel free to minify it further for your own needs!
+
+        'use strict'; let zzfx, zzfxV, zzfxX
+
+        // ZzFXMicro - Zuper Zmall Zound Zynth - v1.1.8 ~ 884 bytes minified
+        zzfxV = .3    // volume
+        zzfx =       // play sound
+            (p = 1, k = .05, b = 220, e = 0, r = 0, t = .1, q = 0, D = 1, u = 0, y = 0, v = 0, z = 0, l = 0, E = 0, A = 0, F = 0, c = 0, w = 1, m = 0, B = 0) => {
+                let
+                    M = Math, R = 44100, d = 2 * M.PI, G = u *= 500 * d / R / R, C = b *= (1 - k + 2 * k * M.random(k = [])) * d / R, g = 0, H = 0, a = 0, n = 1, I = 0
+                    , J = 0, f = 0, x, h; e = R * e + 9; m *= R; r *= R; t *= R; c *= R; y *= 500 * d / R ** 3; A *= d / R; v *= d / R; z *= R; l = R * l | 0; for (h = e + m +
+                        r + t + c | 0; a < h; k[a++] = f)++J % (100 * F | 0) || (f = q ? 1 < q ? 2 < q ? 3 < q ? M.sin((g % d) ** 3) : M.max(M.min(M.tan(g), 1)
+                            , -1) : 1 - (2 * g / d % 2 + 2) % 2 : 1 - 4 * M.abs(M.round(g / d) - g / d) : M.sin(g), f = (l ? 1 - B + B * M.sin(d * a / l) : 1) * (0 < f ? 1 :
+                                -1) * M.abs(f) ** D * p * zzfxV * (a < e ? a / e : a < e + m ? 1 - (a - e) / m * (1 - w) : a < e + m + r ? w : a < h - c ? (h - a - c) / t * w : 0), f = c ? f /
+                                    2 + (c > a ? 0 : (a < h - c ? 1 : (h - a) / c) * k[a - c | 0] / 2) : f), x = (b += u += y) * M.cos(A * H++), g += x - x * E * (1 - 1E9 * (M.sin(a)
+                                        + 1) % 2), n && ++n > z && (b += v, C += v, n = 0), !l || ++I % l || (b = C, u = G, n = n || 1); p = zzfxX.createBuffer(1, h, R); p.
+                                            getChannelData(0).set(k); b = zzfxX.createBufferSource(); b.buffer = p; b.connect(zzfxX.destination
+                                            ); b.start(); return b
+            }; zzfxX = new (window.AudioContext || webkitAudioContext) // audio context
+
+        var x = -100;
+        var y = 0;
+        var velX = 0;
+        var velY = 0;
+        const speed = 300; // original: 300
+        var zone = 1;
+
+        var isGameStarted = false;
+
+        window.onload = function () {
+            var keys = [];
+            // key events
+            document.body.addEventListener("keydown", function (e) {
+                keys[e.keyCode] = true;
+
+                if (e.keyCode == 38 || e.keyCode == 40) {
+                    e.preventDefault();
+                }
+            });
+            document.body.addEventListener("keyup", function (e) {
+                keys[e.keyCode] = false;
+            });
+
+            document.body.addEventListener("keydown", onKeyDown);
+
+            window.addEventListener('mousemove', onMouseMove, false);
+            window.addEventListener('mousedown', onMouseDown, false);
+
+            var c = document.getElementById('game_canvas');
+            var width = c.width;
+            var height = c.height;
+
+            const SIZE = 32;
+
+            const A = 25;
+            const B = 32;
+
+            const maxTrackPlayerCount = 5;
+
+            var isFlipped = false;
+
+            var manaMines = [];
+            var manaBalls = {};
+
+            var shadows = [];
+
+            var enemies = [];
+
+            var battles = [];
+
+            var shadowCounts = {};
+            var shadowLimits = {};
+
+            var isGameOver = false;
+            var isVictory = false;
+
+            var isCircleVisible = false;
+            const circleSpeed = 1000;
+            var circleSource = null;
+            var circleDest = null;
+            const circleSize = 25;
+            var circleX = 0;
+            var circleY = 0;
+
+            const maxPlayerHP = 250;
+            const maxPlayerMP = 1000;
+
+            var playerHP = 250;
+            var playerMP = 0;
+
+            const manaBallSpeed = 200;
+
+            const maxOpponents = 4;
+
+            const battleApproachSpeed = 100;
+            const battleMinDistance = 50;
+
+            const shadowRegroupSpeed = 150;
+
+            function initVariables() {
+                x = -100;
+                y = 0;
+                velX = 0;
+                velY = 0;
+                zone = 1;
+
+                isFlipped = false;
+
+                manaMines = [];
+                manaBalls = {};
+
+                shadows = [];
+
+                enemies = [];
+
+                battles = [];
+
+                shadowCounts = {};
+                shadowLimits = {};
+
+                isGameOver = false;
+                isVictory = false;
+
+                isCircleVisible = false;
+                circleSource = null;
+                circleDest = null;
+                circleX = 0;
+                circleY = 0;
+
+                playerHP = 250;
+                playerMP = 0;
+
+                var shadowTypes = [
+                    'slime',
+                    'skeleton',
+                    'goblin',
+                    'demon'
+                ];
+                for (var i = 0; i < shadowTypes.length; i++) {
+                    var type = shadowTypes[i];
+                    changeShadowCount(type, 0);
+                    changeShadowLimit(type, 0);
+                }
+                changePlayerHP(0);
+                changePlayerMP(0);
+            }
+
+            function getPlayerPos() {
+                return {
+                    x: Math.floor(x + width / 2),
+                    y: Math.floor(y + height / 2)
+                };
+            }
+
+            var ctx = c.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+
+            window.requestAnimationFrame(gameLoop);
+
+            var seed = 1;
+            function seededRandom() {
+                var x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            }
+
+            function createManaMine(zone) {
+                var randomPos = getRandomPosInZone(zone, () => {
+                    return seededRandom();
+                });
+
+                manaMines.push({
+                    x: randomPos.x,
+                    y: randomPos.y
+                });
+            }
+
+            // createManaMine(300, 300);
+            // createManaMine(200, 200);
+
+            function createManaBalls() {
+                for (var i = 0; i < manaMines.length; i++) {
+                    var manaMine = manaMines[i];
+
+                    if (i in manaBalls) {
+
+                    } else {
+                        var source = {
+                            x: manaMine.x,
+                            y: manaMine.y
+                        };
+                        var dest = {
+                            x: x,
+                            y: y
+                        }
+
+                        if (distance(source, {
+                            x: x + width / 2,
+                            y: y + height / 2
+                        }) < 8 * SIZE) {
+                            manaBalls[i] = {
+                                x: manaMine.x,
+                                y: manaMine.y,
+                                source: source,
+                                dest: dest
+                            };
+                        }
+                    }
+                }
+            }
+
+            function updateManaBall(ballId, secondsPassed) {
+                var ball = manaBalls[ballId];
+
+                // temp
+                ball.dest = getPlayerPos();
+
+                var unitVector = getUnitVector({
+                    x: ball.x,
+                    y: ball.y
+                }, ball.dest);
+
+                var dx = unitVector.x * manaBallSpeed * secondsPassed;
+                var dy = unitVector.y * manaBallSpeed * secondsPassed;
+
+                ball.x += dx;
+                ball.y += dy;
+
+                var travelledDistance = getVectorNorm({
+                    x: ball.x - ball.source.x,
+                    y: ball.y - ball.source.y
+                });
+
+                var maxTravelledDistance = getVectorNorm({
+                    x: ball.dest.x - ball.source.x,
+                    y: ball.dest.y - ball.source.y
+                });
+
+                if (travelledDistance >= maxTravelledDistance) {
+                    manaBalls[ballId].done = true;
+
+                    changePlayerMP(10);
+                    // circleSource = null;
+                    // circleDest = null;
+
+                    // isCircleVisible = false;
+
+                    // zzfx(...[2.32,,232,.04,.16,.49,1,3.97,.6,,,,.15,.3,,.3,.06,.48,.09]); // Explosion 304
+                    // zzfx(...[1.06,,694,.05,.13,.54,4,4.08,.7,.4,,,,.4,,.3,,.49,.05]); // Explosion 306
+                    // zzfx(...[2.34,,342,.02,.14,.43,,3.48,.4,,,,,.3,,.9,.3,.45,.05]); // Explosion 370
+                    // zzfx(...[2.01,,67,,.03,.04,,.88,7.8,,,,,.8,,.2,.07,.99,.01]); // Hit 382
+                    // zzfx(...[1.07,,89,.02,.08,.12,1,1.21,,,,,,1,,.4,,.77,.08]); // Hit 389
+
+
+
+                    // zzfx(...[2.01, 0, 470, .02, .09, .06, 1, 1.05, , .4, , , , , , , .23, .65, .02, .29]);
+                    // zzfx(...[,,452,.02,.02,.18,,.63,-1.3,,104,.14,,.4,,,,.93,.02,.05]);
+
+                    // zzfx(...[,0,493.8833,.01,.04,.13,,1.94,,,,.01,,,,,,.89,.04,.04]); // Pickup 140
+                }
+            }
+
+            function drawManaBall(ballId, secondsPassed) {
+                var ball = manaBalls[ballId];
+
+                ctx.fillStyle = "#60c0eb";
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, 12, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            function drawManaBalls(secondsPassed) {
+                for (const ballId in manaBalls) {
+                    updateManaBall(ballId, secondsPassed);
+                    drawManaBall(ballId, secondsPassed);
+                }
+
+                for (const ballId in manaBalls) {
+                    var ball = manaBalls[ballId];
+
+                    if (ball.done) {
+                        delete manaBalls[ballId];
+                    }
+                }
+
+                if (Object.keys(manaBalls).length == 0) {
+                    createManaBalls();
+                }
+            }
+
+            function createBattle(shadow, enemy) {
+                battles.push({
+                    shadow: shadow,
+                    enemy: enemy
+                });
+            }
+
+            function removeDeadShadows() {
+                var i = shadows.length;
+                while (i--) {
+                    if (shadows[i].dead) {
+                        changeShadowCount(shadows[i].type, -1);
+
+                        shadows.splice(i, 1);
+                    }
+                }
+            }
+
+            function removeDeadEnemies() {
+                var i = enemies.length;
+                while (i--) {
+                    if (enemies[i].dead) {
+                        enemies.splice(i, 1);
+                    }
+                }
+            }
+
+            function removeDoneBattles() {
+                var i = battles.length;
+                while (i--) {
+                    if (battles[i].done) {
+                        battles.splice(i, 1);
+                    }
+                }
+            }
+
+            function removeManaMines() {
+                manaMines = [];
+                manaBalls = {};
+            }
+
+            function prepareBattles() {
+                try {
+                    removeDeadShadows();
+                    removeDeadEnemies();
+                    removeDoneBattles();
+
+                    for (var i = 0; i < enemies.length; i++) {
+                        for (var j = 0; j < shadows.length; j++) {
+                            var enemy = enemies[i];
+                            var shadow = shadows[j];
+
+                            if (enemy.dead || shadow.dead || !shadow.drawn) {
+                                continue;
+                            }
+
+                            if (enemy.targetOpponent == null && shadow.opponents.length < maxOpponents) {
+                                enemy.opponents.push(shadow);
+                                shadow.opponents.push(enemy);
+
+                                enemy.targetOpponent = shadow;
+                                enemy.trackPlayer = false;
+
+                                if (shadow.targetOpponent == null) {
+                                    shadow.targetOpponent = enemy;
+                                }
+
+                                createBattle(shadow, enemy);
+                            } else if (shadow.targetOpponent == null && enemy.opponents.length < maxOpponents) {
+                                enemy.opponents.push(shadow);
+                                shadow.opponents.push(enemy);
+
+                                shadow.targetOpponent = enemy;
+
+                                if (enemy.targetOpponent == null) {
+                                    enemy.targetOpponent = shadow;
+                                    enemy.trackPlayer = false;
+                                }
+
+                                createBattle(shadow, enemy);
+                            }
+                        }
+                    }
+
+                    for (var i = 0; i < enemies.length; i++) {
+                        var enemy = enemies[i];
+
+                        if (enemy.targetOpponent == null) {
+                            var playerPos = {
+                                x: x + width / 2,
+                                y: y + height / 2
+                            };
+
+                            if (distance(enemy, playerPos) < SIZE * 6) {
+                                // target player
+                                enemy.trackPlayer = true;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+
+                setTimeout(prepareBattles, 500);
+            }
+
+            function removeItemOnce(arr, value) {
+                var index = arr.indexOf(value);
+                if (index > -1) {
+                    arr.splice(index, 1);
+                }
+                return arr;
+            }
+
+            function regenerateHP() {
+                changePlayerHP(3);
+
+                setTimeout(regenerateHP, 1000);
+            }
+
+            function shuffle(a) {
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function executeBattles() {
+                // randomize battle order
+                shuffle(battles);
+
+                for (var i = 0; i < battles.length; i++) {
+                    var battle = battles[i];
+
+                    if (battle.done) {
+                        continue;
+                    }
+
+                    var shadow = battle.shadow;
+                    var enemy = battle.enemy;
+
+                    if (distance(shadow, enemy) <= battleMinDistance) {
+                        if (enemy.targetOpponent == shadow) {
+                            shadow.hp -= enemy.attack;
+                        }
+                        if (shadow.targetOpponent == enemy) {
+                            enemy.hp -= shadow.attack;
+                        }
+
+                        console.log('shadow hp: ' + shadow.hp);
+                        console.log('enemy hp: ' + enemy.hp);
+
+                        if (shadow.hp <= 0) {
+                            shadow.dead = true;
+
+                            battle.done = true;
+                        }
+                        if (enemy.hp <= 0) {
+                            if (!enemy.dead) {
+                                evaluateEnemyDeath(enemy);
+                            }
+                            enemy.dead = true;
+
+                            battle.done = true;
+                        }
+
+                        if (battle.done) {
+                            removeItemOnce(shadow.opponents, enemy);
+                            removeItemOnce(enemy.opponents, shadow);
+
+                            if (shadow.opponents.length > 0) {
+                                shadow.targetOpponent = shadow.opponents[0];
+                            } else {
+                                shadow.targetOpponent = null;
+                            }
+
+                            if (enemy.opponents.length > 0) {
+                                enemy.targetOpponent = enemy.opponents[0];
+                            } else {
+                                enemy.targetOpponent = null;
+                            }
+                        }
+
+                        // zzfx(...[,,358,.02,.03,.09,,.33,2.5,,,,,.7,,,,.86,.04,.11]); // Hit 262
+                    }
+                }
+
+                var trackPlayerCount = 0;
+
+                for (var i = 0; i < enemies.length; i++) {
+                    var enemy = enemies[i];
+
+                    if (enemy.trackPlayer && trackPlayerCount < maxTrackPlayerCount) {
+                        var playerPos = {
+                            x: x + width / 2,
+                            y: y + height / 2
+                        };
+
+                        if (distance(enemy, playerPos) <= battleMinDistance) {
+                            changePlayerHP(-enemy.attack);
+                        }
+
+                        trackPlayerCount++;
+                    }
+                }
+
+                setTimeout(executeBattles, 1000);
+            }
+
+            function getEnemyStats(type) {
+                var hp = 0;
+                var rank = 0;
+                var attack = 0;
+                var zone = 0;
+                if (type == 'slime') {
+                    rank = 1;
+                    hp = 10;
+                    attack = 5;
+                    zone = 1;
+                } else if (type == 'skeleton') {
+                    rank = 2;
+                    hp = 50;
+                    attack = 10;
+                    zone = 3;
+                } else if (type == 'goblin') {
+                    rank = 3;
+                    hp = 100;
+                    attack = 30;
+                    zone = 5;
+                } else if (type == 'demon') {
+                    rank = 4;
+                    hp = 400;
+                    attack = 60;
+                    zone = 5;
+                } else if (type == 'soldier') {
+                    hp = 100;
+                    attack = 30;
+                    zone = 7;
+                } else if (type == 'knight') {
+                    hp = 200;
+                    attack = 40;
+                    zone = 7;
+                } else if (type == 'king') {
+                    hp = 2500;
+                    attack = 100;
+                    zone = 7;
+                }
+
+                return {
+                    hp: hp,
+                    attack: attack,
+                    rank: rank,
+                    zone: zone
+                };
+            }
+
+            function useMPForShadow(type) {
+                var cost = 0;
+                if (type == 'slime') {
+                    cost = 1;
+                } else if (type == 'skeleton') {
+                    cost = 5;
+                } else if (type == 'goblin') {
+                    cost = 10;
+                } else if (type == 'demon') {
+                    cost = 30;
+                }
+
+                if (cost > playerMP) {
+                    return false;
+                } else {
+                    changePlayerMP(-cost);
+                    return true;
+                }
+            }
+
+            function createShadow(type) {
+                if (shadowCounts[type] >= shadowLimits[type]) {
+                    return;
+                }
+                if (!useMPForShadow(type)) {
+                    return;
+                }
+
+                var stats = getEnemyStats(type);
+
+                var hp = stats.hp;
+                var rank = stats.rank;
+                var attack = stats.attack;
+
+                shadows.push({
+                    type: type,
+                    x: 0,
+                    y: 0,
+                    opponents: [],
+                    hp: hp,
+                    attack: attack,
+                    rank: rank,
+                    timestmap: Date.now()
+                });
+
+                changeShadowCount(type, 1);
+
+                shadows.sort((a, b) => {
+                    if (a.rank < b.rank) {
+                        return 1;
+                    } else if (a.rank > b.rank) {
+                        return -1;
+                    } else if (a.rank == b.rank) {
+                        return a.rank - b.rank;
+                    }
+                });
+            }
+
+            function rint(min, max, random) { // min and max included 
+                if (!random) {
+                    random = () => Math.random();
+                }
+                return Math.floor(random() * (max - min + 1) + min)
+            }
+
+            function applyZoneBoundary(pos, zone) {
+                var x = pos.x;
+                var y = pos.y;
+                if (zone == 1) {
+                    if (x < Math.floor(-10.5 * SIZE) + width / 2) {
+                        x = Math.floor(-10.5 * SIZE) + width / 2;
+                    }
+                    if (x > Math.floor(26.5 * SIZE) + width / 2) {
+                        x = Math.floor(26.5 * SIZE) + width / 2;
+                    }
+                    if (y < Math.floor(-10.5 * SIZE) + height / 2) {
+                        y = Math.floor(-10.5 * SIZE) + height / 2;
+                    }
+                    if (y > Math.floor(13.5 * SIZE) + height / 2) {
+                        y = Math.floor(13.5 * SIZE) + height / 2;
+                    }
+                } else if (zone == 3) {
+                    const lowerX = Math.floor(29.5 * SIZE);
+                    const upperX = Math.floor((26.5 + 40) * SIZE);
+
+                    if (x < lowerX + width / 2) {
+                        x = lowerX + width / 2;
+                    }
+                    if (x > upperX + width / 2) {
+                        x = upperX + width / 2;
+                    }
+                    if (y < Math.floor(-10.5 * SIZE) + height / 2) {
+                        y = Math.floor(-10.5 * SIZE) + height / 2;
+                    }
+                    if (y > Math.floor(13.5 * SIZE) + height / 2) {
+                        y = Math.floor(13.5 * SIZE) + height / 2;
+                    }
+                } else if (zone == 5) {
+                    const lowerX = Math.floor((29.5 + 40) * SIZE);
+                    const upperX = Math.floor((26.5 + 40 + 40) * SIZE);
+
+                    if (x < lowerX + width / 2) {
+                        x = lowerX + width / 2;
+                    }
+                    if (x > upperX + width / 2) {
+                        x = upperX + width / 2;
+                    }
+                    if (y < Math.floor(-10.5 * SIZE) + height / 2) {
+                        y = Math.floor(-10.5 * SIZE) + height / 2;
+                    }
+                    if (y > Math.floor(13.5 * SIZE) + height / 2) {
+                        y = Math.floor(13.5 * SIZE) + height / 2;
+                    }
+                } else if (zone == 7) {
+                    const lowerX = Math.floor((29.5 + 40 + 40) * SIZE);
+                    const upperX = Math.floor((26.5 + 40 + 40 + 40) * SIZE);
+
+                    if (x < lowerX + width / 2) {
+                        x = lowerX + width / 2;
+                    }
+                    if (x > upperX + width / 2) {
+                        x = upperX + width / 2;
+                    }
+                    if (y < Math.floor(-10.5 * SIZE) + height / 2) {
+                        y = Math.floor(-10.5 * SIZE) + height / 2;
+                    }
+                    if (y > Math.floor(13.5 * SIZE) + height / 2) {
+                        y = Math.floor(13.5 * SIZE) + height / 2;
+                    }
+                }
+
+                return {
+                    x: x,
+                    y: y
+                };
+            }
+
+            function getRandomDestination(pos) {
+                var dx = 3 * SIZE * (Math.random() - 0.5) * 2;
+                var dy = 3 * SIZE * (Math.random() - 0.5) * 2;
+
+                return {
+                    x: pos.x + dx,
+                    y: pos.y + dy
+                };
+            }
+
+            function getRandomPosInZone(zone, random) {
+                var x = 0;
+                var y = 0;
+
+                if (zone == 1) {
+                    const lowerX = Math.floor(-10.5 * SIZE);
+                    const upperX = Math.floor(26.5 * SIZE);
+
+                    const lowerY = Math.floor(-10.5 * SIZE);
+                    const upperY = Math.floor(13.5 * SIZE);
+
+                    x = rint(lowerX, upperX, random) + width / 2;
+                    y = rint(lowerY, upperY, random) + height / 2;
+                } else if (zone == 3) {
+                    const lowerX = Math.floor(29.5 * SIZE);
+                    const upperX = Math.floor((26.5 + 40) * SIZE);
+
+                    const lowerY = Math.floor(-10.5 * SIZE);
+                    const upperY = Math.floor(13.5 * SIZE);
+
+                    x = rint(lowerX, upperX, random) + width / 2;
+                    y = rint(lowerY, upperY, random) + height / 2;
+                } else if (zone == 5) {
+                    const lowerX = Math.floor((29.5 + 40) * SIZE);
+                    const upperX = Math.floor((26.5 + 40 + 40) * SIZE);
+
+                    const lowerY = Math.floor(-10.5 * SIZE);
+                    const upperY = Math.floor(13.5 * SIZE);
+
+                    x = rint(lowerX, upperX, random) + width / 2;
+                    y = rint(lowerY, upperY, random) + height / 2;
+                } else if (zone == 7) {
+                    const lowerX = Math.floor((29.5 + 40 + 40) * SIZE);
+                    const upperX = Math.floor((26.5 + 40 + 40 + 40) * SIZE);
+
+                    const lowerY = Math.floor(-10.5 * SIZE);
+                    const upperY = Math.floor(13.5 * SIZE);
+
+                    x = rint(lowerX, upperX, random) + width / 2;
+                    y = rint(lowerY, upperY, random) + height / 2;
+                }
+
+                return {
+                    x: x,
+                    y: y
+                }
+            }
+
+            function evaluateEnemyDeath(enemy) {
+                if (enemy.type == 'king') {
+                    victory();
+                }
+
+                changeShadowLimit(enemy.type, 1);
+            }
+
+            function createEnemy(type, zone) {
+                var stats = getEnemyStats(type);
+
+                var hp = stats.hp;
+                var attack = stats.attack;
+                var zone = stats.zone;
+
+                var randomPos = getRandomPosInZone(zone);
+                var x = randomPos.x;
+                var y = randomPos.y;
+
+                enemies.push({
+                    type: type,
+                    x: x,
+                    y: y,
+                    opponents: [],
+                    hp: hp,
+                    attack: attack,
+                    zone: zone
+                });
+            }
+
+            function evaluateZone() {
+                for (var i = 0; i < enemies.length; i++) {
+                    var enemy = enemies[i];
+                    enemy.dead = true;
+                }
+                removeDeadEnemies();
+                removeManaMines();
+
+                if (zone == 1) {
+                    for (var i = 0; i < 50; i++) {
+                        createEnemy('slime', 1);
+                    }
+
+                    for (var i = 0; i < 10; i++) {
+                        createManaMine(1);
+                    }
+                } else if (zone == 3) {
+                    for (var i = 0; i < 50; i++) {
+                        createEnemy('skeleton', 3);
+                    }
+
+                    for (var i = 0; i < 8; i++) {
+                        createManaMine(3);
+                    }
+                } else if (zone == 5) {
+                    for (var i = 0; i < 30; i++) {
+                        createEnemy('goblin', 5);
+                    }
+                    for (var i = 0; i < 10; i++) {
+                        createEnemy('demon', 5);
+                    }
+
+                    for (var i = 0; i < 5; i++) {
+                        createManaMine(5);
+                    }
+                } else if (zone == 7) {
+                    if (isVictory) {
+                        return;
+                    }
+                    for (var i = 0; i < 50; i++) {
+                        createEnemy('soldier', 7);
+                    }
+                    for (var i = 0; i < 50; i++) {
+                        createEnemy('knight', 7);
+                    }
+                    for (var i = 0; i < 1; i++) {
+                        createEnemy('king', 7);
+                    }
+                }
+            }
+
+            function onKeyDown(e) {
+                if (isGameOver) {
+                    return;
+                }
+
+                const keyCode = e.keyCode;
+                if (keyCode == 49) {
+                    createShadow('slime');
+                }
+                if (keyCode == 50) {
+                    createShadow('skeleton');
+                }
+                if (keyCode == 51) {
+                    createShadow('goblin');
+                }
+                if (keyCode == 52) {
+                    createShadow('demon');
+                }
+            }
+
+            function onMouseMove(e) {
+                // var pos = getMousePos(c, e);
+                // circleX = pos.x;
+                // circleY = pos.y;
+                // drawCircle();
+            }
+
+            function onMouseDown(e) {
+                if (!isGameStarted) {
+                    isGameStarted = true;
+
+                    startGame();
+
+                    document.getElementById('start_overlay').style.display = 'none';
+
+                    return;
+                }
+
+                if (isGameOver) {
+                    restartGame();
+                    return;
+                }
+
+                var pos = getMousePos(c, e);
+
+                if (!circleDest) {
+                    circleX = Math.floor(x + width / 2);
+                    circleY = Math.floor(y + height / 2 - SIZE);
+
+                    circleSource = {
+                        x: circleX,
+                        y: circleY
+                    };
+                    circleDest = {
+                        x: pos.x + Math.floor(x),
+                        y: pos.y + Math.floor(y)
+                    };
+
+                    isCircleVisible = true;
+
+                    // zzfx(...[,,452,.02,.02,.18,,.63,-1.3,,104,.14,,.4,,,,.93,.02,.05]); // Random 169
+                    // zzfx(...[2.01,0,470,.02,.09,.06,1,1.05,,.4,,,,,,,.23,.65,.02,.29]); // Shoot 1
+
+                    // zzfx(...[1.01,,125,.03,.02,.03,,1.65,8.9,,,,,.7,,.2,,.88,.05,.16]); // Hit 100
+
+                    // zzfx(...[2,,456,.01,.08,,,1.57,,,,,,1,,,.13,.4,.09,.14]); // Hit 117
+
+                    // zzfx(...[,,854,.13,.21,.11,,1.06,,,-557,,,,,,,,.01]); // Random 118
+
+                    // soft hit sound
+                    // zzfx(...[,,655,.01,.01,.14,1,2.8,-13,-3.3,,,,,,,,,.01,.28]); // Random 150
+                }
+
+                // drawCircle();
+            }
+
+            function getMousePos(canvas, evt) {
+                var rect = canvas.getBoundingClientRect();
+                return {
+                    x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+                    y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+                };
+            }
+
+            function startGame() {
+                restartGame();
+
+                prepareBattles();
+                executeBattles();
+                regenerateHP();
+                createManaBalls();
+            }
+
+            function restartGame() {
+                initVariables();
+
+                evaluateZone();
+
+                document.getElementById('gameover_overlay').style.display = 'none';
+            }
+
+            restartGame();
+
+            function gameOver() {
+                if (isVictory) {
+                    return;
+                }
+
+                isGameOver = true;
+
+                document.getElementById('gameover_overlay').style.display = 'block';
+            }
+
+            function victory() {
+                isVictory = true;
+
+                document.getElementById('victory_overlay').style.display = 'block';
+            }
+
+            function changePlayerHP(deltaHP) {
+                playerHP += deltaHP;
+
+                console.log('change player hp: ' + playerHP);
+
+                if (playerHP > maxPlayerHP) {
+                    playerHP = maxPlayerHP;
+                }
+                if (playerHP < 0) {
+                    playerHP = 0;
+                }
+                if (playerHP <= 0) {
+                    gameOver();
+                }
+
+                document.getElementById('current_hp').innerHTML = playerHP;
+
+                var percent = Math.round(playerHP * 100.0 / maxPlayerHP);
+                document.getElementById('hp_bar').style.width = percent + '%';
+            }
+
+            function changeShadowCount(type, deltaCount) {
+                if (shadowCounts[type]) {
+                    shadowCounts[type] += deltaCount;
+                } else {
+                    shadowCounts[type] = deltaCount;
+                }
+
+                if (type == 'slime') {
+                    document.getElementById('slime_count').innerHTML = shadowCounts[type];
+                } else if (type == 'skeleton') {
+                    document.getElementById('skeleton_count').innerHTML = shadowCounts[type];
+                } else if (type == 'goblin') {
+                    document.getElementById('goblin_count').innerHTML = shadowCounts[type];
+                } else if (type == 'demon') {
+                    document.getElementById('demon_count').innerHTML = shadowCounts[type];
+                }
+            }
+
+            function changeShadowLimit(type, deltaLimit) {
+                if (shadowLimits[type]) {
+                    shadowLimits[type] += deltaLimit;
+                } else {
+                    shadowLimits[type] = deltaLimit;
+                }
+
+                var limit = shadowLimits[type];
+                if (type == 'slime') {
+                    if (limit > 100) {
+                        shadowLimits[type] = 100;
+                    }
+                } else if (type == 'skeleton') {
+                    if (limit > 100) {
+                        shadowLimits[type] = 100;
+                    }
+                } else if (type == 'goblin') {
+                    if (limit > 100) {
+                        shadowLimits[type] = 100;
+                    }
+                } else if (type == 'demon') {
+                    if (limit > 100) {
+                        shadowLimits[type] = 100;
+                    }
+                }
+
+                if (type == 'slime') {
+                    document.getElementById('slime_limit').innerHTML = shadowLimits[type];
+                } else if (type == 'skeleton') {
+                    document.getElementById('skeleton_limit').innerHTML = shadowLimits[type];
+                } else if (type == 'goblin') {
+                    document.getElementById('goblin_limit').innerHTML = shadowLimits[type];
+                } else if (type == 'demon') {
+                    document.getElementById('demon_limit').innerHTML = shadowLimits[type];
+                }
+            }
+
+            function changePlayerMP(deltaMP) {
+                playerMP += deltaMP;
+
+                if (playerMP > maxPlayerMP) {
+                    playerMP = maxPlayerMP;
+                }
+                if (playerMP < 0) {
+                    playerMP = 0;
+                }
+
+                console.log('change player mp: ' + playerMP);
+
+                document.getElementById('current_mp').innerHTML = playerMP;
+
+                var percent = Math.round(playerMP * 100.0 / maxPlayerMP);
+                document.getElementById('mp_bar').style.width = percent + '%';
+            }
+
+            function drawCircle() {
+                ctx.fillStyle = "#fbf236";
+                ctx.beginPath();
+                ctx.arc(circleX, circleY, circleSize, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            function drawEnemy(enemy, img, x, y) {
+                if (enemy.isFlipped) {
+                    flipHorizontally(img, x, y);
+                } else {
+                    ctx.drawImage(img, x, y, SIZE, SIZE);
+                }
+            }
+
+            function drawShadow(img, x, y) {
+                if (isFlipped) {
+                    flipHorizontally(img, x, y);
+                } else {
+                    ctx.drawImage(img, x, y, SIZE, SIZE);
+                }
+            }
+
+            function flipHorizontally(img, x, y) {
+                ctx.save();
+
+                // move to x + img's width
+                ctx.translate(x, y);
+
+                // scaleX by -1; this "trick" flips horizontally
+                ctx.scale(-1, 1);
+
+                // draw the img
+                // no need for x,y since we've already translated
+                ctx.drawImage(img, 0, 0, -1 * SIZE, SIZE);
+
+                // always clean up -- reset transformations to default
+                // ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                ctx.restore();
+            }
+
+            function getVectorNorm(a) {
+                return Math.sqrt(a.x * a.x + a.y * a.y);
+            }
+
+            function getUnitVector(a, b) {
+                var dx = b.x - a.x;
+                var dy = b.y - a.y;
+
+                var norm = getVectorNorm({
+                    x: dx,
+                    y: dy
+                });
+
+                return {
+                    x: dx / norm,
+                    y: dy / norm
+                };
+            }
+
+            var gridPositionMap = {};
+
+            function getGridPosition(index) {
+                if (gridPositionMap[index]) {
+                    return gridPositionMap[index];
+                }
+
+                for (var s = 3; s < 50; s += 2) {
+                    if (index < Math.pow(s, 2) - 1) {
+                        var x = -Math.floor(s / 2);
+                        var y = Math.floor(s / 2);
+
+                        var total = Math.pow(s, 2) - Math.pow(s - 2, 2);
+
+                        var c1 = Math.floor(total / 4);
+                        var c2 = c1 * 2;
+                        var c3 = c1 * 3;
+
+                        var ringIndex = index - Math.pow(s - 2, 2) + 1;
+
+                        for (var i = 0; i < ringIndex; i++) {
+                            if (i < c1) {
+                                x++;
+                            } else if (i < c2) {
+                                y--;
+                            } else if (i < c3) {
+                                x--;
+                            } else {
+                                y++;
+                            }
+                        }
+
+                        var pos = {
+                            x: x,
+                            y: -y
+                        };
+
+                        gridPositionMap[index] = pos;
+
+                        return pos;
+                    }
+                }
+
+                return null;
+            }
+
+            function moveToPos(a, b, speed, secondsPassed) {
+                if (a.x == b.x && a.y == b.y) {
+                    return {
+                        x: a.x,
+                        y: a.y
+                    };
+                }
+
+                var unitVector = getUnitVector({
+                    x: a.x,
+                    y: a.y
+                }, {
+                    x: b.x,
+                    y: b.y
+                });
+
+                var dx = unitVector.x * speed * secondsPassed;
+                var dy = unitVector.y * speed * secondsPassed;
+
+                return {
+                    x: a.x + dx,
+                    y: a.y + dy
+                };
+            }
+
+            function distance(a, b) {
+                var d = getVectorNorm({
+                    x: a.x - b.x,
+                    y: a.y - b.y
+                });
+
+                return d;
+            }
+
+            function drawBridge(num) {
+                const offset = SIZE * 40 * num;
+
+                var wood = document.getElementById('wood');
+                ctx.drawImage(wood, offset + SIZE * 40 - 2 * SIZE, Math.floor(A / 2) * SIZE - 3 * SIZE, SIZE, SIZE);
+                ctx.drawImage(wood, offset + SIZE * 40 - 1 * SIZE, Math.floor(A / 2) * SIZE - 3 * SIZE, SIZE, SIZE);
+                ctx.drawImage(wood, offset + SIZE * 40 - 2 * SIZE, Math.floor(A / 2) * SIZE - 2 * SIZE, SIZE, SIZE);
+                ctx.drawImage(wood, offset + SIZE * 40 - 1 * SIZE, Math.floor(A / 2) * SIZE - 2 * SIZE, SIZE, SIZE);
+                ctx.drawImage(wood, offset + SIZE * 40 - 2 * SIZE, Math.floor(A / 2) * SIZE - SIZE, SIZE, SIZE);
+                ctx.drawImage(wood, offset + SIZE * 40 - 1 * SIZE, Math.floor(A / 2) * SIZE - SIZE, SIZE, SIZE);
+                ctx.drawImage(wood, offset + SIZE * 40 - 2 * SIZE, Math.floor(A / 2) * SIZE, SIZE, SIZE);
+                ctx.drawImage(wood, offset + SIZE * 40 - 1 * SIZE, Math.floor(A / 2) * SIZE, SIZE, SIZE);
+            }
+
+            function conditionalDraw(img, posX, posY, sizeA, sizeB) {
+                const PAD = 200;
+                if (posX < x - PAD ||
+                    posX > x + width + PAD ||
+                    posY < y - PAD ||
+                    posY > y + height + PAD) {
+                    return;
+                }
+
+                ctx.drawImage(img, posX, posY, sizeA, sizeB);
+            }
+
+            function draw(secondsPassed) {
+                if (!isGameStarted) {
+                    return;
+                }
+
+                ctx.resetTransform();
+
+                ctx.clearRect(0, 0, width, height);
+
+                const bridgeUpper = Math.floor(1.5 * SIZE);
+                const bridgeLower = Math.floor(-1.5 * SIZE);
+
+                if (zone == 1) {
+                    if (x < Math.floor(-10.5 * SIZE)) {
+                        x = Math.floor(-10.5 * SIZE);
+                    }
+                    if (x > Math.floor(26.5 * SIZE)) {
+                        if (y > bridgeUpper || y < bridgeLower) {
+                            x = Math.floor(26.5 * SIZE);
+                        } else {
+                            zone = 2;
+                            evaluateZone();
+                        }
+                    }
+                    if (y < Math.floor(-10.5 * SIZE)) {
+                        y = Math.floor(-10.5 * SIZE);
+                    }
+                    if (y > Math.floor(13.5 * SIZE)) {
+                        y = Math.floor(13.5 * SIZE);
+                    }
+                } else if (zone == 2) { // bridge
+                    if (x <= Math.floor(26.5 * SIZE)) {
+                        zone = 1;
+                        evaluateZone();
+                    }
+                    if (x >= Math.floor(29.5 * SIZE)) {
+                        zone = 3;
+                        evaluateZone();
+                    }
+
+                    if (y > bridgeUpper) {
+                        y = bridgeUpper;
+                    }
+                    if (y < bridgeLower) {
+                        y = bridgeLower;
+                    }
+                } else if (zone == 3) {
+                    if (x < Math.floor(29.5 * SIZE)) {
+                        if (y > bridgeUpper || y < bridgeLower) {
+                            x = Math.floor(29.5 * SIZE);
+                        } else {
+                            zone = 2;
+                            evaluateZone();
+                        }
+                    }
+                    if (x > Math.floor((26.5 + 40) * SIZE)) {
+                        if (y > bridgeUpper || y < bridgeLower) {
+                            x = Math.floor((26.5 + 40) * SIZE);
+                        } else {
+                            zone = 4;
+                            evaluateZone();
+                        }
+                    }
+                    if (y < Math.floor(-10.5 * SIZE)) {
+                        y = Math.floor(-10.5 * SIZE);
+                    }
+                    if (y > Math.floor(13.5 * SIZE)) {
+                        y = Math.floor(13.5 * SIZE);
+                    }
+                } else if (zone == 4) { // bridge
+                    if (x <= Math.floor((26.5 + 40) * SIZE)) {
+                        zone = 3;
+                        evaluateZone();
+                    }
+                    if (x >= Math.floor((29.5 + 40) * SIZE)) {
+                        zone = 5;
+                        evaluateZone();
+                    }
+
+                    if (y > bridgeUpper) {
+                        y = bridgeUpper;
+                    }
+                    if (y < bridgeLower) {
+                        y = bridgeLower;
+                    }
+                } else if (zone == 5) {
+                    if (x < Math.floor((29.5 + 40) * SIZE)) {
+                        if (y > bridgeUpper || y < bridgeLower) {
+                            x = Math.floor((29.5 + 40) * SIZE);
+                        } else {
+                            zone = 4;
+                            evaluateZone();
+                        }
+                    }
+                    if (x > Math.floor((26.5 + 40 + 40) * SIZE)) {
+                        if (y > bridgeUpper || y < bridgeLower) {
+                            x = Math.floor((26.5 + 40 + 40) * SIZE);
+                        } else {
+                            zone = 6;
+                            evaluateZone();
+                        }
+                    }
+                    if (y < Math.floor(-10.5 * SIZE)) {
+                        y = Math.floor(-10.5 * SIZE);
+                    }
+                    if (y > Math.floor(13.5 * SIZE)) {
+                        y = Math.floor(13.5 * SIZE);
+                    }
+                } else if (zone == 6) { // bridge
+                    if (x <= Math.floor((26.5 + 40 + 40) * SIZE)) {
+                        zone = 5;
+                        evaluateZone();
+                    }
+                    if (x >= Math.floor((29.5 + 40 + 40) * SIZE)) {
+                        zone = 7;
+                        evaluateZone();
+                    }
+
+                    if (y > bridgeUpper) {
+                        y = bridgeUpper;
+                    }
+                    if (y < bridgeLower) {
+                        y = bridgeLower;
+                    }
+                } else if (zone == 7) {
+                    if (x < Math.floor((29.5 + 40 + 40) * SIZE)) {
+                        if (y > bridgeUpper || y < bridgeLower) {
+                            x = Math.floor((29.5 + 40 + 40) * SIZE);
+                        } else {
+                            zone = 6;
+                            evaluateZone();
+                        }
+                    }
+                    if (x > Math.floor((26.5 + 40 + 40 + 40) * SIZE)) {
+                        x = Math.floor((26.5 + 40 + 40 + 40) * SIZE);
+                    }
+                    if (y < Math.floor(-10.5 * SIZE)) {
+                        y = Math.floor(-10.5 * SIZE);
+                    }
+                    if (y > Math.floor(13.5 * SIZE)) {
+                        y = Math.floor(13.5 * SIZE);
+                    }
+                }
+
+                ctx.translate(Math.floor(-x), Math.floor(-y));
+
+                // console.log('x,y: ' + x + ', ' + y);
+
+                // ctx.clearRect(0, 0, width, height);
+
+                // ctx.fillStyle = 'black';
+                // ctx.fillRect(-1000, -1000, 2000, 2000);
+
+                // console.log('secondsPassed: ' + secondsPassed);
+                // console.log('velX: ' + velX + ', velY: ' + velY);
+                // console.log('x: ' + x + ', y: ' + y);
+
+                // TODO: only draw what is needed where character is
+                // water, grass, sand, dirt, gray
+
+                // TODO: optimize water drawing
+
+                var water = document.getElementById('water');
+                for (var i = -12; i < 175; i++) {
+                    for (var j = -12; j < 37; j++) {
+                        conditionalDraw(water, i * SIZE, j * SIZE, SIZE, SIZE);
+                    }
+                }
+
+                var drawGrassFlag = false;
+                var drawSandFlag = false;
+                var drawDirtFlag = false;
+                var drawStoneFlag = false;
+
+                var grass = document.getElementById('grass');
+                for (var i = 0; i < 1.5 * A; i++) {
+                    for (var j = 0; j < A; j++) {
+                        conditionalDraw(grass, i * SIZE, j * SIZE, SIZE, SIZE);
+                    }
+                }
+
+                var sand = document.getElementById('sand');
+                for (var i = 0; i < 1.5 * A; i++) {
+                    for (var j = 0; j < A; j++) {
+                        conditionalDraw(sand, i * SIZE + SIZE * 40, j * SIZE, SIZE, SIZE);
+                    }
+                }
+
+                var dirt = document.getElementById('dirt');
+                for (var i = 0; i < 1.5 * A; i++) {
+                    for (var j = 0; j < A; j++) {
+                        conditionalDraw(dirt, i * SIZE + SIZE * 40 + SIZE * 40, j * SIZE, SIZE, SIZE);
+                    }
+                }
+
+                var stone = document.getElementById('stone');
+                for (var i = 0; i < 1.5 * A; i++) {
+                    for (var j = 0; j < A; j++) {
+                        conditionalDraw(stone, i * SIZE + SIZE * 40 + SIZE * 40 + SIZE * 40, j * SIZE, SIZE, SIZE);
+                    }
+                }
+
+                drawBridge(0);
+                drawBridge(1);
+                drawBridge(2);
+
+                var slime = document.getElementById('slime');
+                //ctx.drawImage(slime, 100, 100, SIZE, SIZE);
+
+                var skeleton = document.getElementById('skeleton');
+                //ctx.drawImage(skeleton, 200, 200, SIZE, SIZE);
+
+                var goblin = document.getElementById('goblin');
+                //ctx.drawImage(goblin, 400, 400, SIZE, SIZE);
+
+                var demon = document.getElementById('demon');
+                //ctx.drawImage(demon, 500, 500, SIZE, SIZE);
+
+                var alien = document.getElementById('alien');
+                //ctx.drawImage(alien, 600, 600, SIZE, SIZE);
+
+                var soldier = document.getElementById('soldier');
+                var knight = document.getElementById('knight');
+                var king = document.getElementById('king');
+
+                var glow = document.getElementById('glow');
+                // ctx.drawImage(shadowGoblin, 100, 400, SIZE, SIZE);
+
+                var manaCrystals = document.getElementById('mana_crystals');
+                // ctx.drawImage(manaCrystals, 300, 300, SIZE, SIZE);
+                // ctx.drawImage(slime, 300 - SIZE - 5, 300, SIZE, SIZE);
+
+                for (var i = 0; i < manaMines.length; i++) {
+                    var manaMine = manaMines[i];
+
+                    ctx.drawImage(manaCrystals, manaMine.x - SIZE / 2, manaMine.y - SIZE / 2, SIZE, SIZE);
+                }
+
+                ctx.save();
+                // ctx.filter = 'drop-shadow(0px 0px 16px #5fcde4)';//' invert(100%) grayscale(80%)';
+                for (var i = 0; i < shadows.length; i++) {
+                    var shadow = shadows[i];
+
+                    if (shadow.dead) {
+                        continue;
+                    }
+
+                    var shadowGridPos = getGridPosition(i);
+                    var destPos = {
+                        x: Math.floor(x + shadowGridPos.x * SIZE * 1.3 + width / 2),
+                        y: Math.floor(y + shadowGridPos.y * SIZE * 1.3 + width / 2)
+                    };
+
+                    if (shadow.drawn) {
+                        if (shadow.opponents.length > 0) {
+                            var newPos = moveToPos(shadow, shadow.opponents[0], battleApproachSpeed, secondsPassed);
+
+                            if (distance(shadow, shadow.opponents[0]) > battleMinDistance) {
+                                shadow.x = newPos.x;
+                                shadow.y = newPos.y;
+                            }
+                        } else {
+                            var newPos = moveToPos(shadow, destPos, shadowRegroupSpeed, secondsPassed);
+
+                            shadow.x = newPos.x;
+                            shadow.y = newPos.y;
+
+                            if (distance(shadow, destPos) <= 5) {
+                                shadow.x = destPos.x;
+                                shadow.y = destPos.y;
+                            }
+                        }
+                    } else {
+                        shadow.x = destPos.x;
+                        shadow.y = destPos.y;
+
+                        shadow.drawn = true;
+                    }
+
+                    ctx.drawImage(glow, shadow.x - SIZE, shadow.y - SIZE, 2 * SIZE, 2 * SIZE);
+
+                    if (shadow.type == 'slime') {
+                        drawShadow(slime, shadow.x - SIZE / 2, shadow.y - SIZE / 2, SIZE, SIZE);
+                    } else if (shadow.type == 'skeleton') {
+                        drawShadow(skeleton, shadow.x - SIZE / 2, shadow.y - SIZE / 2, SIZE, SIZE);
+                    } else if (shadow.type == 'goblin') {
+                        drawShadow(goblin, shadow.x - SIZE / 2, shadow.y - SIZE / 2, SIZE, SIZE);
+                    } else if (shadow.type == 'demon') {
+                        drawShadow(demon, shadow.x - SIZE / 2, shadow.y - SIZE / 2, SIZE, SIZE);
+                    }
+                }
+                ctx.restore();
+
+                var trackPlayerCount = 0;
+
+                for (var i = 0; i < enemies.length; i++) {
+                    var enemy = enemies[i];
+
+                    if (enemy.dead) {
+                        continue;
+                    }
+
+                    if (enemy.trackPlayer && trackPlayerCount < maxTrackPlayerCount) {
+                        var playerPos = {
+                            x: x + width / 2,
+                            y: y + height / 2
+                        };
+                        var newPos = moveToPos(enemy, playerPos, battleApproachSpeed, secondsPassed);
+
+                        if (newPos.x > enemy.x) {
+                            enemy.isFlipped = false;
+                        } else {
+                            enemy.isFlipped = true;
+                        }
+
+                        if (distance(enemy, playerPos) > battleMinDistance) {
+                            enemy.x = newPos.x;
+                            enemy.y = newPos.y;
+                        }
+
+                        trackPlayerCount++;
+                    } else if (enemy.opponents.length > 0) {
+                        var newPos = moveToPos(enemy, enemy.opponents[0], battleApproachSpeed, secondsPassed);
+
+                        if (newPos.x > enemy.x) {
+                            enemy.isFlipped = false;
+                        } else {
+                            enemy.isFlipped = true;
+                        }
+
+                        if (distance(enemy, enemy.opponents[0]) > battleMinDistance) {
+                            enemy.x = newPos.x;
+                            enemy.y = newPos.y;
+                        }
+                    } else {
+                        if (enemy.randomDest) {
+                            var newPos = moveToPos(enemy, enemy.randomDest, 50, secondsPassed);
+
+                            if (newPos.x > enemy.x) {
+                                enemy.isFlipped = false;
+                            } else {
+                                enemy.isFlipped = true;
+                            }
+
+                            enemy.x = newPos.x;
+                            enemy.y = newPos.y;
+
+                            if (distance(enemy, enemy.randomDest) < 15) {
+                                var dest = getRandomDestination(enemy);
+                                dest = applyZoneBoundary(dest, enemy.zone);
+                                enemy.randomDest = dest;
+                            }
+                        } else {
+                            var dest = getRandomDestination(enemy);
+                            dest = applyZoneBoundary(dest, enemy.zone);
+                            enemy.randomDest = dest;
+                        }
+                    }
+
+                    if (enemy.type == 'slime') {
+                        drawEnemy(enemy, slime, enemy.x - SIZE / 2, enemy.y - SIZE / 2, SIZE, SIZE);
+                    } else if (enemy.type == 'skeleton') {
+                        drawEnemy(enemy, skeleton, enemy.x - SIZE / 2, enemy.y - SIZE / 2, SIZE, SIZE);
+                    } else if (enemy.type == 'goblin') {
+                        drawEnemy(enemy, goblin, enemy.x - SIZE / 2, enemy.y - SIZE / 2, SIZE, SIZE);
+                    } else if (enemy.type == 'demon') {
+                        drawEnemy(enemy, demon, enemy.x - SIZE / 2, enemy.y - SIZE / 2, SIZE, SIZE);
+                    } else if (enemy.type == 'soldier') {
+                        drawEnemy(enemy, soldier, enemy.x - SIZE / 2, enemy.y - SIZE / 2, SIZE, SIZE);
+                    } else if (enemy.type == 'knight') {
+                        drawEnemy(enemy, knight, enemy.x - SIZE / 2, enemy.y - SIZE / 2, SIZE, SIZE);
+                    } else if (enemy.type == 'king') {
+                        drawEnemy(enemy, king, enemy.x - SIZE / 2, enemy.y - SIZE / 2, SIZE, SIZE);
+                    }
+                }
+
+                var img = document.getElementById('necromancer');
+
+                if (!isGameOver) {
+                    if (isFlipped) {
+                        flipHorizontally(img, Math.floor(x + width / 2 - SIZE / 2), Math.floor(y + height / 2 - SIZE / 2));
+                    } else {
+                        ctx.drawImage(img, Math.floor(x + width / 2 - SIZE / 2), Math.floor(y + height / 2 - SIZE / 2), SIZE, SIZE);
+                    }
+
+
+                    if (isCircleVisible) {
+                        if (circleDest) {
+                            var unitVector = getUnitVector({
+                                x: circleX,
+                                y: circleY
+                            }, circleDest);
+
+                            var dx = unitVector.x * circleSpeed * secondsPassed;
+                            var dy = unitVector.y * circleSpeed * secondsPassed;
+
+                            circleX += dx;
+                            circleY += dy;
+
+                            var travelledDistance = getVectorNorm({
+                                x: circleX - circleSource.x,
+                                y: circleY - circleSource.y
+                            });
+
+                            var maxTravelledDistance = getVectorNorm({
+                                x: circleDest.x - circleSource.x,
+                                y: circleDest.y - circleSource.y
+                            });
+
+                            if (travelledDistance >= maxTravelledDistance) {
+                                circleSource = null;
+                                circleDest = null;
+
+                                isCircleVisible = false;
+
+                                // zzfx(...[2.32,,232,.04,.16,.49,1,3.97,.6,,,,.15,.3,,.3,.06,.48,.09]); // Explosion 304
+                                // zzfx(...[1.06,,694,.05,.13,.54,4,4.08,.7,.4,,,,.4,,.3,,.49,.05]); // Explosion 306
+                                // zzfx(...[2.34,,342,.02,.14,.43,,3.48,.4,,,,,.3,,.9,.3,.45,.05]); // Explosion 370
+                                // zzfx(...[2.01,,67,,.03,.04,,.88,7.8,,,,,.8,,.2,.07,.99,.01]); // Hit 382
+                                // zzfx(...[1.07,,89,.02,.08,.12,1,1.21,,,,,,1,,.4,,.77,.08]); // Hit 389
+
+
+
+                                zzfx(...[2.01, 0, 470, .02, .09, .06, 1, 1.05, , .4, , , , , , , .23, .65, .02, .29]);
+                                // zzfx(...[, , 452, .02, .02, .18, , .63, -1.3, , 104, .14, , .4, , , , .93, .02, .05]);
+
+                                for (var i = 0; i < enemies.length; i++) {
+                                    var enemy = enemies[i];
+
+                                    if (distance({
+                                        x: enemy.x,
+                                        y: enemy.y
+                                    }, {
+                                        x: circleX,
+                                        y: circleY
+                                    }) < circleSize * 1.5) {
+                                        enemy.hp -= 50;
+                                        if (enemy.hp <= 0) {
+                                            if (!enemy.dead) {
+                                                evaluateEnemyDeath(enemy);
+                                            }
+                                            enemy.dead = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        drawCircle();
+                    }
+
+                    drawManaBalls(secondsPassed);
+                }
+
+                /*
+                context.save();
+                context.scale(-1, 1);
+                context.drawImage(v, 0, 0, width*-1, height);
+                context.restore();
+                */
+            }
+
+            let secondsPassed;
+            let oldTimeStamp;
+            let fps;
+
+            function gameLoop(timeStamp) {
+                // console.log('timestamp: ' + timeStamp);
+
+                // Calculate the number of seconds passed since the last frame
+                secondsPassed = (timeStamp - oldTimeStamp) / 1000.0;
+                oldTimeStamp = timeStamp;
+
+                // Calculate fps
+                fps = Math.round(1 / secondsPassed);
+
+                // console.log('fps: ' + fps);
+
+                if (secondsPassed > 0) {
+                    // check the keys and do the movement.
+                    if (keys[38] || keys[87]) {
+                        if (velY > -speed) {
+                            velY = -speed;
+                        }
+                    } else if (keys[40] || keys[83]) {
+                        if (velY < speed) {
+                            velY = speed;
+                        }
+                    } else {
+                        velY = 0;
+                    }
+
+                    if (keys[39] || keys[68]) {
+                        if (velX < speed) {
+                            velX = speed;
+                            isFlipped = false;
+                        }
+                    } else if (keys[37] || keys[65]) {
+                        if (velX > -speed) {
+                            velX = -speed;
+                            isFlipped = true;
+                        }
+                    } else {
+                        velX = 0;
+                    }
+
+                    var deltaX = velX * secondsPassed;
+                    var deltaY = velY * secondsPassed;
+
+                    // console.log('deltaX: ' + deltaX);
+                    // console.log('deltaY: ' + deltaY);
+                    // console.log('x : ' + (x + deltaX));
+                    // console.log('y : ' + (y + deltaY));
+
+                    if (!isGameOver) {
+                        x = x + deltaX;
+                        y = y + deltaY;
+                    }
+
+                    draw(secondsPassed);
+                }
+
+                window.requestAnimationFrame(gameLoop);
+            }
+        };
+
+    </script>
+
+</body>
+
+</html>
